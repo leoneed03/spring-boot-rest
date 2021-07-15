@@ -5,14 +5,12 @@ import org.application.model.UserData;
 import org.application.model.UserDataValidator;
 import org.application.service.UserServiceMessageHelper;
 import org.application.service.UserStorageService;
-
-import javax.validation.ConstraintViolationException;
-import javax.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,7 +32,8 @@ public class UserDataController {
 
     @PostMapping("/")
     @ResponseStatus(HttpStatus.CREATED)
-    public UserData saveUser(@RequestBody @Valid UserData user) throws UserException {
+    @Validated(UserData.class)
+    public UserData saveUser(@Valid @RequestBody UserData user) throws UserException {
 
         if (user == null) {
 

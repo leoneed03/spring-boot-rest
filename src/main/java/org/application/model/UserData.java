@@ -1,15 +1,13 @@
 package org.application.model;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import org.hibernate.validator.constraints.Email;
+import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.persistence.*;
-import org.hibernate.validator.constraints.Length;
 
 @Data
 @AllArgsConstructor
