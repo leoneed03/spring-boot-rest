@@ -5,11 +5,14 @@ import org.application.model.UserData;
 import org.application.model.UserDataValidator;
 import org.application.service.UserServiceMessageHelper;
 import org.application.service.UserStorageService;
+
+import javax.validation.ConstraintViolationException;
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.ValidationException;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,7 +34,7 @@ public class UserDataController {
 
     @PostMapping("/")
     @ResponseStatus(HttpStatus.CREATED)
-    public UserData saveUser(@RequestBody UserData user) throws UserException {
+    public UserData saveUser(@RequestBody @Valid UserData user) throws UserException {
 
         if (user == null) {
 
@@ -46,21 +49,12 @@ public class UserDataController {
                     HttpStatus.BAD_REQUEST);
         }
 
-        try {
-
-            return userStorageService.saveUser(user);
-
-        } catch (ValidationException constraintViolationException) {
-
-            throw new UserException(userServiceMessageHelper.getInvalidUserParameters()
-                    + ":\n" + constraintViolationException.getMessage(),
-                    HttpStatus.BAD_REQUEST);
-        }
+        return userStorageService.saveUser(user);
     }
 
     @PutMapping("/{id}")
     public UserData updateUser(@PathVariable("id") Long userId,
-                               @RequestBody UserData user) throws UserException {
+                               @RequestBody @Valid UserData user) throws UserException {
 
         if (userId == null) {
 
@@ -83,19 +77,10 @@ public class UserDataController {
                     HttpStatus.BAD_REQUEST);
         }
 
-        try {
-
-            return userStorageService.updateIfPresent(userId, user).orElseThrow(
-                    () -> new UserException(userServiceMessageHelper.getUserNotFound(userId),
-                            HttpStatus.NOT_FOUND)
-            );
-
-        } catch (ValidationException constraintViolationException) {
-
-            throw new UserException(userServiceMessageHelper.getInvalidUserParameters()
-                    + ":\n" + constraintViolationException.getMessage(),
-                    HttpStatus.BAD_REQUEST);
-        }
+        return userStorageService.updateIfPresent(userId, user).orElseThrow(
+                () -> new UserException(userServiceMessageHelper.getUserNotFound(userId),
+                        HttpStatus.NOT_FOUND)
+        );
     }
 
     @GetMapping("/")

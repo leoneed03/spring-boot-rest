@@ -4,11 +4,12 @@ package org.application.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.persistence.*;
-import javax.validation.constraints.Size;
+import org.hibernate.validator.constraints.Length;
 
 @Data
 @AllArgsConstructor
@@ -23,7 +24,7 @@ public class UserData {
     private Long id;
 
     @Column(name = "USER_NAME")
-    @Size(max = 20, min = 3, message = "{user.name.invalid}")
+    @Length(max = 20, min = 3, message = "{user.name.invalid}")
     @NotEmpty(message="Please Enter your name")
     private String name;
 
