@@ -65,8 +65,10 @@ public class UserDataController {
     }
 
     @PutMapping("/{id}")
-    public UserData updateUser(@PathVariable("id") Long userId,
-                               @RequestBody UserData user) throws UserException {
+    public UserDataDTO updateUser(@PathVariable("id") Long userId,
+                                  @RequestBody UserDataDTO userDataDTO) throws UserException {
+
+        UserData user = userMapper.toUserData(userDataDTO);
 
         if (userId == null) {
 
@@ -89,12 +91,12 @@ public class UserDataController {
                     HttpStatus.BAD_REQUEST);
         }
 
-        return userStorageService.updateIfPresent(userId, user);
+        return userMapper.toUserDataDTO(userStorageService.updateIfPresent(userId, user));
     }
 
     @GetMapping("/")
-    public List<UserData> getAllUsers() {
-        return userStorageService.getAllUsers();
+    public List<UserDataDTO> getAllUsers() {
+        return userMapper.toUserDataList(userStorageService.getAllUsers());
     }
 
     @DeleteMapping("/{id}")
@@ -117,7 +119,7 @@ public class UserDataController {
     }
 
     @GetMapping("/{id}")
-    public UserData getUser(@PathVariable("id") Long userId) throws UserException {
+    public UserDataDTO getUser(@PathVariable("id") Long userId) throws UserException {
 
         if (userId == null) {
 
@@ -125,6 +127,6 @@ public class UserDataController {
                     HttpStatus.BAD_REQUEST);
         }
 
-        return userStorageService.getById(userId);
+        return userMapper.toUserDataDTO(userStorageService.getById(userId));
     }
 }
