@@ -2,7 +2,9 @@ package org.application.controller;
 
 import org.application.exceptions.UserException;
 import org.application.model.UserData;
+import org.application.model.UserDataDTO;
 import org.application.model.UserDataValidator;
+import org.application.model.mapping.UserMapper;
 import org.application.service.UserServiceMessageHelper;
 import org.application.service.UserStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,19 +21,24 @@ public class UserDataController {
     private final UserStorageService userStorageService;
     private final UserDataValidator userDataValidator;
     private final UserServiceMessageHelper userServiceMessageHelper;
+    private final UserMapper userMapper;
 
     @Autowired
     public UserDataController(UserStorageService userStorageService,
                               UserDataValidator userDataValidator,
-                              UserServiceMessageHelper userServiceMessageHelper) {
+                              UserServiceMessageHelper userServiceMessageHelper,
+                              UserMapper userMapper) {
         this.userStorageService = userStorageService;
         this.userDataValidator = userDataValidator;
         this.userServiceMessageHelper = userServiceMessageHelper;
+        this.userMapper = userMapper;
     }
 
     @PostMapping("/")
     @ResponseStatus(HttpStatus.CREATED)
-    public UserData saveUser(@RequestBody UserData user) throws UserException {
+    public UserDataDTO saveUser(@RequestBody UserDataDTO userDataDTO) throws UserException {
+
+        UserData user = userMapper.toUserData(userDataDTO);
 
         if (user == null) {
 
@@ -48,7 +55,7 @@ public class UserDataController {
 
         try {
 
-            return userStorageService.saveUser(user);
+            return userMapper.toUserDataDTO(userStorageService.saveUser(user));
 
         } catch (DataIntegrityViolationException integrityViolationException) {
 

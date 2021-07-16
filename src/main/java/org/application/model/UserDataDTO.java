@@ -1,11 +1,12 @@
 package org.application.model;
 
-import org.hibernate.validator.constraints.Email;
-import org.hibernate.validator.constraints.NotEmpty;
+import lombok.Data;
+import lombok.ToString;
 
-import javax.persistence.Column;
-
+@Data
+@ToString
 public class UserDataDTO {
+    private Long id;
     private String name;
     private String email;
 }
