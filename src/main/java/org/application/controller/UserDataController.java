@@ -3,7 +3,6 @@ package org.application.controller;
 import org.application.exceptions.UserException;
 import org.application.model.UserData;
 import org.application.model.UserDataDTO;
-import org.application.model.UserDataValidator;
 import org.application.model.mapping.UserMapper;
 import org.application.service.UserServiceMessageHelper;
 import org.application.service.UserStorageService;
@@ -19,19 +18,20 @@ import java.util.List;
 @RequestMapping("/userdata")
 public class UserDataController {
     private final UserStorageService userStorageService;
-    private final UserDataValidator userDataValidator;
     private final UserServiceMessageHelper userServiceMessageHelper;
     private final UserMapper userMapper;
 
     @Autowired
     public UserDataController(UserStorageService userStorageService,
-                              UserDataValidator userDataValidator,
                               UserServiceMessageHelper userServiceMessageHelper,
                               UserMapper userMapper) {
         this.userStorageService = userStorageService;
-        this.userDataValidator = userDataValidator;
         this.userServiceMessageHelper = userServiceMessageHelper;
         this.userMapper = userMapper;
+    }
+
+    private boolean userHasId(UserData userData) {
+        return userData.getId() != null;
     }
 
     @PostMapping("/")
@@ -47,7 +47,7 @@ public class UserDataController {
                     HttpStatus.BAD_REQUEST);
         }
 
-        if (!userDataValidator.isUserValidNoId(user)) {
+        if (userHasId(user)) {
 
             throw new UserException(userServiceMessageHelper.getInvalidUserParameters(),
                     HttpStatus.BAD_REQUEST);
@@ -84,7 +84,7 @@ public class UserDataController {
                     HttpStatus.BAD_REQUEST);
         }
 
-        if (!userDataValidator.isUserValidNoId(user)) {
+        if (userHasId(user)) {
 
             throw new UserException(
                     userServiceMessageHelper.getInvalidUserParameters(),

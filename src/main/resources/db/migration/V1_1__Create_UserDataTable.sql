@@ -5,3 +5,5 @@ create table TBL_USERS
     USER_NAME  varchar(255) NOT NULL
 );
 insert into TBL_USERS (USER_EMAIL, USER_NAME) values ('FlyWay@mail.ru', 'FlyWayUser');
+CREATE INDEX idx_tbl_users_name
+    ON TBL_USERS(USER_NAME);
