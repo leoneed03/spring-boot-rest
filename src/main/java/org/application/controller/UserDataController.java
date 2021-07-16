@@ -6,13 +6,12 @@ import org.application.model.UserDataValidator;
 import org.application.service.UserServiceMessageHelper;
 import org.application.service.UserStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/userdata")
@@ -32,8 +31,7 @@ public class UserDataController {
 
     @PostMapping("/")
     @ResponseStatus(HttpStatus.CREATED)
-    @Validated(UserData.class)
-    public UserData saveUser(@Valid @RequestBody UserData user) throws UserException {
+    public UserData saveUser(@RequestBody UserData user) throws UserException {
 
         if (user == null) {
 
@@ -48,12 +46,20 @@ public class UserDataController {
                     HttpStatus.BAD_REQUEST);
         }
 
-        return userStorageService.saveUser(user);
+        try {
+
+            return userStorageService.saveUser(user);
+
+        } catch (DataIntegrityViolationException integrityViolationException) {
+
+            throw new UserException(integrityViolationException.getMessage(),
+                    HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PutMapping("/{id}")
     public UserData updateUser(@PathVariable("id") Long userId,
-                               @RequestBody @Valid UserData user) throws UserException {
+                               @RequestBody UserData user) throws UserException {
 
         if (userId == null) {
 
@@ -76,10 +82,7 @@ public class UserDataController {
                     HttpStatus.BAD_REQUEST);
         }
 
-        return userStorageService.updateIfPresent(userId, user).orElseThrow(
-                () -> new UserException(userServiceMessageHelper.getUserNotFound(userId),
-                        HttpStatus.NOT_FOUND)
-        );
+        return userStorageService.updateIfPresent(userId, user);
     }
 
     @GetMapping("/")
@@ -97,13 +100,13 @@ public class UserDataController {
                     HttpStatus.BAD_REQUEST);
         }
 
-        boolean userWasFound = userStorageService.deleteById(userId);
+        try {
 
-        if (!userWasFound) {
+            userStorageService.deleteById(userId);
 
-            throw new UserException(userServiceMessageHelper.getUserNotFound(userId),
-                    HttpStatus.NOT_FOUND);
+        } catch (EmptyResultDataAccessException ignored) {
         }
+
     }
 
     @GetMapping("/{id}")
@@ -115,11 +118,6 @@ public class UserDataController {
                     HttpStatus.BAD_REQUEST);
         }
 
-        Optional<UserData> userDataFound = userStorageService.getById(userId);
-
-        return userDataFound.orElseThrow(
-                () -> new UserException(userServiceMessageHelper.getUserNotFound(userId),
-                        HttpStatus.NOT_FOUND)
-        );
+        return userStorageService.getById(userId);
     }
 }

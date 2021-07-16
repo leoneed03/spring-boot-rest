@@ -1,8 +1,11 @@
 package org.application.service;
 
+import org.application.exceptions.UserException;
 import org.application.model.UserData;
 import org.application.repository.UserDataRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,10 +15,13 @@ import java.util.Optional;
 @Service
 public class UserStorageService {
     private final UserDataRepo repo;
+    private final UserServiceMessageHelper userServiceMessageHelper;
 
     @Autowired
-    public UserStorageService(UserDataRepo repo) {
+    public UserStorageService(UserDataRepo repo,
+                              UserServiceMessageHelper userServiceMessageHelper) {
         this.repo = repo;
+        this.userServiceMessageHelper = userServiceMessageHelper;
     }
 
     @Transactional
@@ -31,33 +37,32 @@ public class UserStorageService {
     }
 
     @Transactional
-    public boolean deleteById(final Long id) {
+    public void deleteById(final Long id) {
 
-        Integer userDeleted = repo.deleteUserDataById(id);
-
-        return userDeleted != 0;
+        repo.deleteById(id);
     }
 
     @Transactional
-    public Optional<UserData> getById(final Long id) {
+    public UserData getById(final Long id) throws UserException {
 
-        return repo.findById(id);
+        return repo.findById(id).orElseThrow(() ->
+                new UserException(userServiceMessageHelper.getUserNotFound(id),
+                        HttpStatus.NOT_FOUND));
     }
 
+    //return UserData or throw exception
     @Transactional
-    public Optional<UserData> updateIfPresent(final Long id,
-                                              final UserData user) {
+    public UserData updateIfPresent(final Long id,
+                                    final UserData user) throws UserException {
         Optional<UserData> userDataFoundOpt = repo.findById(id);
 
-        if (userDataFoundOpt.isEmpty()) {
-            return Optional.empty();
-        }
-
-        UserData userDataFound = userDataFoundOpt.get();
+        UserData userDataFound = userDataFoundOpt.orElseThrow(() ->
+                new UserException(userServiceMessageHelper.getUserNotFound(id),
+                        HttpStatus.NOT_FOUND));
 
         userDataFound.setName(user.getName());
         userDataFound.setEmail(user.getEmail());
 
-        return Optional.of(userDataFound);
+        return userDataFound;
     }
 }
