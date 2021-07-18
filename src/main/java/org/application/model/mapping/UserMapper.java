@@ -1,7 +1,7 @@
 package org.application.model.mapping;
 
-import org.application.model.UserData;
-import org.application.model.UserDataDTO;
+import org.application.model.user.UserData;
+import org.application.model.user.UserDataDTO;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

@@ -1,4 +1,4 @@
-package org.application.model;
+package org.application.model.user;
 
 import lombok.*;
 

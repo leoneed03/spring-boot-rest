@@ -1,8 +1,8 @@
 package org.application.controller;
 
 import org.application.exceptions.UserException;
-import org.application.model.UserData;
-import org.application.model.UserDataDTO;
+import org.application.model.user.UserData;
+import org.application.model.user.UserDataDTO;
 import org.application.model.mapping.UserMapper;
 import org.application.service.UserServiceMessageHelper;
 import org.application.service.UserStorageService;

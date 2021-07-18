@@ -19,11 +19,4 @@ public class ExceptionHandlerCustom {
 
         return userException;
     }
-
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public UserException handleException(MethodArgumentNotValidException exception) {
-
-        return new UserException(exception.getMessage(), HttpStatus.BAD_REQUEST);
-    }
 }

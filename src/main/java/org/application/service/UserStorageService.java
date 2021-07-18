@@ -1,10 +1,9 @@
 package org.application.service;
 
 import org.application.exceptions.UserException;
-import org.application.model.UserData;
+import org.application.model.user.UserData;
 import org.application.repository.UserDataRepo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,7 +49,6 @@ public class UserStorageService {
                         HttpStatus.NOT_FOUND));
     }
 
-    //return UserData or throw exception
     @Transactional
     public UserData updateIfPresent(final Long id,
                                     final UserData user) throws UserException {

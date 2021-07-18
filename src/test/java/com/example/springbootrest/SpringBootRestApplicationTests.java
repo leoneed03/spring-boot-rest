@@ -2,7 +2,7 @@ package com.example.springbootrest;
 
 import org.application.SpringBootRestApplication;
 import org.application.exceptions.UserException;
-import org.application.model.UserData;
+import org.application.model.user.UserData;
 import org.application.service.UserStorageService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
