@@ -3,109 +3,88 @@ package com.example.springbootrest.service;
 import org.application.SpringBootRestApplication;
 import org.application.exceptions.UserException;
 import org.application.model.user.UserData;
-import org.application.repository.UserDataRepo;
 import org.application.service.UserServiceMessageHelper;
 import org.application.service.UserStorageService;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.TestPropertySource;
 
-import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 @SpringBootTest(classes = {SpringBootRestApplication.class})
-public class UserStorageServiceTests {
-    @Autowired
-    UserStorageService userStorageService;
+@TestPropertySource(
+        locations = "classpath:application-integrationtest.properties")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+class UserStorageServiceTests {
 
     @Autowired
-    UserServiceMessageHelper userServiceMessageHelper;
+    private UserStorageService userStorageService;
 
-    @MockBean
-    UserDataRepo userDataRepo;
+    @Autowired
+    private UserServiceMessageHelper userServiceMessageHelper;
 
-    private UserData createSomeUser(Long id) {
-        return new UserData(id, "SomeUserName", "some_email@gmail.com");
+    private boolean listOfUsersContainsEmail(String emailToFind) {
+        return userStorageService.getAllUsers().stream()
+                .map(UserData::getEmail)
+                .anyMatch(email -> email.equals(emailToFind));
     }
 
-    private UserData getOtherUser(Long id) {
-        return new UserData(id, "OtherUserName", "other_user_email@gmail.com");
+    private long getIdNotPresent() {
+        return -1001;
     }
 
-    @Test
-    public void testUserRepoSaveInvocation() {
-
-        UserData userToSave = new UserData();
-
-        userToSave.setEmail("user@mail.ru");
-        userToSave.setName("Andrew");
-        userStorageService.saveUser(userToSave);
-
-        Mockito.verify(userDataRepo,
-                Mockito.times(1))
-                .save(userToSave);
+    private UserData getPreSavedUser() {
+        return preSavedUser;
     }
 
-    @Test
-    public void testGetByIdUserExceptionThrown() {
-        long idSaved = 10;
-        long idNotPresent = 0;
+    private UserData preSavedUser = null;
 
-        UserData userToReturn = createSomeUser(idSaved);
-
-        Mockito.doReturn(Optional.of(userToReturn))
-                .when(userDataRepo)
-                .findById(idSaved);
-
-        UserException userNotFound = Assertions.assertThrows(
-                UserException.class,
-                () -> userStorageService.getById(idNotPresent));
-
-        Assertions.assertEquals(userNotFound.getStatus(),
-                HttpStatus.NOT_FOUND);
-        Assertions.assertEquals(userNotFound.getMessage(),
-                userServiceMessageHelper.getUserNotFound(idNotPresent));
-    }
-
-    @Test
-    public void testUpdateUserExceptionNotThrown() {
-        long idSaved = 101;
-
-        UserData userToReturn = createSomeUser(idSaved);
-
-        Mockito.doReturn(Optional.of(userToReturn))
-                .when(userDataRepo)
-                .findById(idSaved);
-
-        Assertions.assertDoesNotThrow(
-                () -> userStorageService.updateIfPresent(
-                        idSaved,
-                        getOtherUser(null)));
+    @BeforeEach
+    void addUsers() {
+        preSavedUser = userStorageService.saveUser(new UserData(null, "PreSavedUserName", "presaved_user_email@gmail.com"));
     }
 
     @Test
     public void testUpdateUserExceptionThrown() {
-        long idSaved = 102;
-        long idNotPresent = 103;
+        long idNotPresent = -103;
 
-        UserData userToReturn = createSomeUser(idSaved);
-
-        Mockito.doReturn(Optional.of(userToReturn))
-                .when(userDataRepo)
-                .findById(idSaved);
+        UserData userDataToUpdate = new UserData(null, "SomeUserName", "some_email@gmail.com");
 
         UserException userNotFound = Assertions.assertThrows(
                 UserException.class,
                 () -> userStorageService.updateIfPresent(
                         idNotPresent,
-                        getOtherUser(null)));
+                        userDataToUpdate));
 
         Assertions.assertEquals(userNotFound.getMessage(),
                 userServiceMessageHelper.getUserNotFound(idNotPresent));
         Assertions.assertEquals(userNotFound.getStatus(),
                 HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    public void testUpdateUser() {
+        long idPresent = getPreSavedUser().getId();
+
+        UserData userDataToUpdate = new UserData(null, "SomeUserName", "some_email@gmail.com");
+
+        Assertions.assertDoesNotThrow(
+                () -> userStorageService.updateIfPresent(
+                        idPresent,
+                        userDataToUpdate));
+        AtomicReference<UserData> userDataFound = new AtomicReference<>();
+
+        Assertions.assertDoesNotThrow(() -> userDataFound.set(userStorageService.getById(idPresent)));
+
+        Assertions.assertEquals(userDataToUpdate.getEmail(), userDataFound.get().getEmail());
+        Assertions.assertEquals(userDataToUpdate.getName(), userDataFound.get().getName());
     }
 }
