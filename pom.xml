@@ -105,7 +105,8 @@
                 <version>7.11.1</version>
                 <configuration>
                     <configFiles>
-                        <configFile>src/main/resources/flyway.conf</configFile>
+                        <configFile>src/main/resources/application.properties</configFile>
+<!--                        <configFile>src/main/resources/flyway.conf</configFile>-->
                     </configFiles>
                 </configuration>
             </plugin>
