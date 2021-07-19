@@ -1,4 +1,4 @@
-package com.example.springbootrest;
+package com.example.springbootrest.controller;
 
 import org.application.SpringBootRestApplication;
 import org.application.model.user.UserData;
@@ -80,8 +80,10 @@ class SpringBootRestApplicationTests {
 
         UserData userDataSaved = userStorageService.saveUser(userDataToSave);
 
-        Assertions.assertEquals(userDataToSave.getEmail(), userDataSaved.getEmail());
-        Assertions.assertEquals(userDataToSave.getName(), userDataSaved.getName());
+        Assertions.assertEquals(userDataToSave.getEmail(),
+                userDataSaved.getEmail());
+        Assertions.assertEquals(userDataToSave.getName(),
+                userDataSaved.getName());
 
         Assertions.assertNotNull(userDataSaved.getId());
         Assertions.assertTrue(userDataSaved.getId() > 0);
@@ -96,11 +98,14 @@ class SpringBootRestApplicationTests {
 
         AtomicReference<UserData> userDataRetrieved = new AtomicReference<>();
 
-        Assertions.assertDoesNotThrow(() -> userDataRetrieved.set(userStorageService.getById(userDataSaved.getId()))
+        Assertions.assertDoesNotThrow(
+                () -> userDataRetrieved.set(userStorageService.getById(userDataSaved.getId()))
         );
 
-        Assertions.assertEquals(userDataToSave.getName(), userDataRetrieved.get().getName());
-        Assertions.assertEquals(userDataToSave.getEmail(), userDataRetrieved.get().getEmail());
+        Assertions.assertEquals(userDataToSave.getName(),
+                userDataRetrieved.get().getName());
+        Assertions.assertEquals(userDataToSave.getEmail(),
+                userDataRetrieved.get().getEmail());
 
         Assertions.assertNotNull(userDataRetrieved.get().getId());
     }
