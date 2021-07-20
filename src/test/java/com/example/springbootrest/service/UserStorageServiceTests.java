@@ -3,16 +3,13 @@ package com.example.springbootrest.service;
 import org.application.SpringBootRestApplication;
 import org.application.exceptions.UserException;
 import org.application.model.user.UserData;
+import org.application.repository.UserDataRepo;
 import org.application.service.UserServiceMessageHelper;
 import org.application.service.UserStorageService;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 
 import java.util.concurrent.atomic.AtomicReference;
@@ -20,25 +17,16 @@ import java.util.concurrent.atomic.AtomicReference;
 @SpringBootTest(classes = {SpringBootRestApplication.class})
 @TestPropertySource(
         locations = "classpath:application-integrationtest.properties")
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class UserStorageServiceTests {
 
     @Autowired
     private UserStorageService userStorageService;
 
     @Autowired
+    private UserDataRepo userDataRepo;
+
+    @Autowired
     private UserServiceMessageHelper userServiceMessageHelper;
-
-    private boolean listOfUsersContainsEmail(String emailToFind) {
-        return userStorageService.getAllUsers().stream()
-                .map(UserData::getEmail)
-                .anyMatch(email -> email.equals(emailToFind));
-    }
-
-    private long getIdNotPresent() {
-        return -1001;
-    }
 
     private UserData getPreSavedUser() {
         return preSavedUser;
@@ -48,8 +36,18 @@ class UserStorageServiceTests {
 
     @BeforeEach
     void addUsers() {
-        preSavedUser = userStorageService.saveUser(new UserData(null, "PreSavedUserName", "presaved_user_email@gmail.com"));
+
+        preSavedUser = userDataRepo.save(new UserData(null, "PreSavedUserName", "presaved_user_email@gmail.com"));
     }
+
+    @AfterEach
+    void deleteUsers() {
+
+        if (userDataRepo.findById(preSavedUser.getId()).isPresent()) {
+            userDataRepo.deleteById(preSavedUser.getId());
+        }
+    }
+
 
     @Test
     public void testUpdateUserExceptionThrown() {

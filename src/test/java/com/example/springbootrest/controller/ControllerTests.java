@@ -5,17 +5,17 @@ import org.application.SpringBootRestApplication;
 import org.application.model.mapping.UserMapper;
 import org.application.model.user.UserData;
 import org.application.model.user.UserDataDTO;
+import org.application.repository.UserDataRepo;
 import org.application.service.UserStorageService;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -30,12 +30,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @TestPropertySource(
         locations = "classpath:application-integrationtest.properties")
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class ControllerTests {
 
     @Autowired
     private UserStorageService userStorageService;
+
+    @Autowired
+    private UserDataRepo userDataRepo;
 
     @Autowired
     private MockMvc mockMvc;
@@ -65,7 +66,16 @@ class ControllerTests {
 
     @BeforeEach
     void addUsers() {
-        preSavedUser = userStorageService.saveUser(new UserData(null, "PreSavedUserName", "presaved_user_email@gmail.com"));
+
+        preSavedUser = userDataRepo.save(new UserData(null, "PreSavedUserName", "presaved_user_email@gmail.com"));
+    }
+
+    @AfterEach
+    void deleteUsers() {
+
+        if (userDataRepo.findById(preSavedUser.getId()).isPresent()) {
+            userDataRepo.deleteById(preSavedUser.getId());
+        }
     }
 
     @Test
@@ -98,11 +108,14 @@ class ControllerTests {
                 .andDo(print())
                 .andExpect(MockMvcResultMatchers.status().isNoContent());
 
+        System.out.println("GET ALL");
         mockMvc.perform(get(pathControllerHelper.getRootPath()))
+                .andDo(print())
                 .andExpect(content().string(allOf(Matchers.not(containsString(
                         getPreSavedUser().getEmail())))));
 
         Assertions.assertFalse(listOfUsersContainsEmail(getPreSavedUser().getEmail()));
+        System.out.println("ASSERTIONS DONE");
     }
 
     @Test
@@ -139,10 +152,10 @@ class ControllerTests {
         String userAsString = objectMapper.writeValueAsString(userDataUpdatedDTO);
 
         mockMvc.perform(put(pathControllerHelper.getRootPath() + getIdNotPresent())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(userAsString))
-                        .andDo(print())
-                        .andExpect(MockMvcResultMatchers.status().isNotFound());
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(userAsString))
+                .andDo(print())
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
 
         Assertions.assertFalse(listOfUsersContainsEmail(userDataUpdated.getEmail()));
     }

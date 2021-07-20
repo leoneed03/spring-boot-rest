@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -33,22 +32,6 @@ class SpringBootRestApplicationTests {
     private MockMvc mockMvc;
 
     @Test
-    @DirtiesContext
-    void getSavedUserApi() throws Exception {
-
-        UserData userDataToSave = new UserData(null, "PreSavedUserName", "presaved_user_email@gmail.com");
-
-        userStorageService.saveUser(userDataToSave);
-
-        mockMvc.perform(get("/userdata/"))
-                .andDo(print())
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(content().string(containsString(userDataToSave.getName())))
-                .andExpect(content().string(containsString(userDataToSave.getEmail())));
-    }
-
-    @Test
-    @DirtiesContext
     void getSavedUserByIdApi() throws Exception {
 
         UserData userDataToSave = new UserData(null, "PreSavedUserName", "presaved_user_email@gmail.com");
@@ -61,6 +44,8 @@ class SpringBootRestApplicationTests {
                 .andExpect(content().string(containsString(userDataToSave.getId().toString())))
                 .andExpect(content().string(containsString(userDataToSave.getName())))
                 .andExpect(content().string(containsString(userDataToSave.getEmail())));
+
+        userStorageService.deleteById(userDataSaved.getId());
     }
 
     @Test
