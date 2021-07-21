@@ -1,7 +1,7 @@
 package com.example.springbootrest.service;
 
-import com.example.springbootrest.service.config.TestConfig;
-import org.application.SpringBootRestApplication;
+import com.example.springbootrest.service.config.TestConfig1;
+import org.application.config.AppConfig;
 import org.application.dummy.RepoDummy;
 import org.application.dummy.RepoDummyImpl;
 import org.application.model.user.UserData;
@@ -10,91 +10,47 @@ import org.application.service.UserStorageService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
-import org.modelmapper.ModelMapper;
-import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@SpringBootTest
-//        (classes = TestConfig.class)
-        (classes = {SpringBootRestApplication.class})
-@Import(TestConfig.class)
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = AppConfig.class)
+@Import(TestConfig1.class)
 @TestPropertySource(
         locations = "classpath:application-integrationtest.properties")
 public class UserStorageServiceStubbedDbTests {
-    //TODO: this does not work as it should
-    @TestConfiguration
-    static class MyTestConfiguration {
-        @Bean
-        public ModelMapper modelMapper() {
-            ModelMapper modelMapper = new ModelMapper();
-
-            modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.LOOSE);
-
-            return modelMapper;
-        }
-
-        @Bean
-        RepoDummy repoDummy() {
-            return new RepoDummyImpl();
-        }
-    }
+    //TODO: why this does not work as it should?
+//    @TestConfiguration
+//    static class MyTestStubConfiguration {
+//        @Bean
+//        RepoDummy repoDummyStub() {
+//            return new RepoDummyStub();
+//        }
+//    }
 
     @Autowired
     UserStorageService userStorageService;
 
-    //    @Qualifier("repoDummyStub")
     @Autowired
-    RepoDummy objectBeingStubbed;
-
-//    @MockBean
-//    UserDataRepo userDataRepoMock;
+    RepoDummy repoDummyBeingStubbed;
 
     @Autowired
     UserDataRepo userDataRepoReal;
 
     @Test
     void testStub() {
-        objectBeingStubbed.save("STUBBED ARG");
+        repoDummyBeingStubbed.save("STUBBED ARG");
 
-        System.out.println(objectBeingStubbed.getAll());
+        System.out.println(repoDummyBeingStubbed.getAll());
 
-        //should be 0 because we use stub
-        Assertions.assertEquals(objectBeingStubbed.getAll().size(), 0);
+        //should be 0 and not 1 because stub is used
+        Assertions.assertEquals(0, repoDummyBeingStubbed.getAll().size());
     }
-
-//    @Test
-//    void testGetStubbedRepo() {
-//        String stubMethodArg = "IS IT MOCKED?";
-//
-//        String userDataSaved = objectBeingStubbed.save("SOMETHING");
-//        objectBeingStubbed.save("SAVED 2");
-//
-//        System.out.println(userDataSaved);
-//
-//        System.out.println(objectBeingStubbed.getAll());
-//
-//        Mockito.doReturn("STUB RETURN VALUE")
-//                .when(objectBeingStubbed)
-//                .save(stubMethodArg);
-//
-//        System.out.println("=============use mocked arg===============");
-//        System.out.println(objectBeingStubbed.save(stubMethodArg));
-//        System.out.println(objectBeingStubbed.getAll());
-//        System.out.println("=============use real arg===============");
-//        System.out.println(objectBeingStubbed.save("SAVE 3"));
-//
-//        System.out.println(objectBeingStubbed.getAll());
-//
-//        Assertions.assertEquals(objectBeingStubbed.getAll().size(), 3);
-//
-//        System.out.println("+++++++++++++REPO MOCK+++++++++++++++");
-//    }
 
     @Test
     void testSpyOnObject() {

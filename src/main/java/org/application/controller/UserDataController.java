@@ -1,10 +1,9 @@
 package org.application.controller;
 
 import org.application.exceptions.UserException;
-import org.application.model.property.UserProperty;
+import org.application.model.mapping.UserMapper;
 import org.application.model.user.UserData;
 import org.application.model.user.UserDataDTO;
-import org.application.model.mapping.UserMapper;
 import org.application.service.UserServiceMessageHelper;
 import org.application.service.UserStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -130,9 +129,4 @@ public class UserDataController {
 
         return userMapper.toUserDataDTO(userStorageService.getById(userId));
     }
-
-//    @GetMapping("/{id}/property")
-//    public List<UserProperty> getUserProperty(@PathVariable("id") Long userId) throws UserException {
-//        return userStorageService.getUserProperty();
-//    }
 }

@@ -21,8 +21,8 @@ public class AppConfig {
         return modelMapper;
     }
 
-//    @Bean
-//    public RepoDummy repoDummy() {
-//        return new RepoDummyImpl();
-//    }
+    @Bean
+    public RepoDummy repoDummy() {
+        return new RepoDummyImpl();
+    }
 }

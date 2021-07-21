@@ -10,7 +10,7 @@ import lombok.ToString;
 @ToString
 @Data
 public class UserPropertyDTO {
-    private Long PROP_ID;
-    private Long OWNER_USER_ID;
-    private String PROP_DESCRIPTION;
+    private Long id;
+    private Long user_id;
+    private String description;
 }
