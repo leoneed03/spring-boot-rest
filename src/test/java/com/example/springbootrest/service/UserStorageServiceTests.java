@@ -2,8 +2,11 @@ package com.example.springbootrest.service;
 
 import org.application.SpringBootRestApplication;
 import org.application.exceptions.UserException;
+import org.application.model.property.UserProperty;
+import org.application.model.property.UserPropertyDTO;
 import org.application.model.user.UserData;
 import org.application.repository.UserDataRepo;
+import org.application.repository.UserPropertyRepo;
 import org.application.service.UserServiceMessageHelper;
 import org.application.service.UserStorageService;
 import org.junit.jupiter.api.*;
@@ -12,6 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.TestPropertySource;
 
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 @SpringBootTest(classes = {SpringBootRestApplication.class})
@@ -24,6 +28,9 @@ class UserStorageServiceTests {
 
     @Autowired
     private UserDataRepo userDataRepo;
+
+    @Autowired
+    private UserPropertyRepo userPropertyRepo;
 
     @Autowired
     private UserServiceMessageHelper userServiceMessageHelper;
@@ -83,5 +90,20 @@ class UserStorageServiceTests {
 
         Assertions.assertEquals(userDataToUpdate.getEmail(), userDataFound.get().getEmail());
         Assertions.assertEquals(userDataToUpdate.getName(), userDataFound.get().getName());
+    }
+
+    @Test
+    public void testGetProperty() {
+        System.out.println(userStorageService.getUserProperty());
+    }
+
+    @Test
+    public void testGetAllPropertyById() {
+        System.out.println(userPropertyRepo.getAllPropertyList((long) 3));
+    }
+
+    @Test
+    public void testGetAllPropertyByEmail() {
+        System.out.println(userPropertyRepo.getAllUserPropertyByEmailList("user_3@mail.ru"));
     }
 }

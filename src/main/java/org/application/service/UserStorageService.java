@@ -1,9 +1,13 @@
 package org.application.service;
 
 import org.application.exceptions.UserException;
+import org.application.model.property.UserProperty;
+import org.application.model.property.UserPropertyDTO;
 import org.application.model.user.UserData;
 import org.application.repository.UserDataRepo;
+import org.application.repository.UserPropertyRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,12 +19,21 @@ import java.util.Optional;
 public class UserStorageService {
     private final UserDataRepo repo;
     private final UserServiceMessageHelper userServiceMessageHelper;
+    private final UserPropertyRepo propertyRepo;
 
     @Autowired
     public UserStorageService(UserDataRepo repo,
-                              UserServiceMessageHelper userServiceMessageHelper) {
+                              UserServiceMessageHelper userServiceMessageHelper,
+                              UserPropertyRepo propertyRepo) {
         this.repo = repo;
         this.userServiceMessageHelper = userServiceMessageHelper;
+        this.propertyRepo = propertyRepo;
+    }
+
+    @Transactional
+    public List<UserProperty> getUserProperty() {
+        return propertyRepo.getAllUserPropertyList();
+//        return propertyRepo.getAllUserProperty();
     }
 
     @Transactional
