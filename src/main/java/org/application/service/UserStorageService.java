@@ -17,7 +17,6 @@ import java.util.Optional;
 public class UserStorageService {
     private final UserDataRepo repo;
     private final UserServiceMessageHelper userServiceMessageHelper;
-    private final UserPropertyRepo propertyRepo;
 
     @Autowired
     public UserStorageService(UserDataRepo repo,
@@ -25,7 +24,6 @@ public class UserStorageService {
                               UserPropertyRepo propertyRepo) {
         this.repo = repo;
         this.userServiceMessageHelper = userServiceMessageHelper;
-        this.propertyRepo = propertyRepo;
     }
 
     @Transactional

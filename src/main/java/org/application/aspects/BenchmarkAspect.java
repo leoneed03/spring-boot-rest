@@ -13,24 +13,35 @@ import org.springframework.stereotype.Component;
 @Aspect
 public class BenchmarkAspect {
     @Before("execution(* org.application.service.UserStorageService.*(..))")
-    public void anyApiCallBefore() {
+    public void anyServiceCallBefore() {
         System.out.println("___________ASPECT CALL BEFORE______________");
     }
 
     @After("execution(* org.application.service.UserStorageService.*(..))")
-    public void anyApiCallAfter(JoinPoint joinPoint) {
-        System.out.println("___________ASPECT CALL AFTER_______________");
+    public void anyServiceCallAfter() {
+        System.out.println("___________ASPECT CALL AFTER______________");
+    }
+
+    @Before("@annotation(LogThisExecutionTime)")
+    public void loggedServiceCallBefore(JoinPoint joinPoint) {
+        System.out.println("______________________________LOGGING BEGINS_______________");
+    }
+
+    @After("@annotation(LogThisExecutionTime)")
+    public void loggedServiceCallAfter(JoinPoint joinPoint) {
+        System.out.println("______________________________LOGGING ENDS_________________");
     }
 
     @Around("@annotation(LogThisExecutionTime)")
-    public Object logThisExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
+    public Object logExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
         long start = System.currentTimeMillis();
 
         Object proceed = joinPoint.proceed();
 
         long executionTime = System.currentTimeMillis() - start;
 
-        System.out.println("logging: " + joinPoint.getSignature() + " executed in " + executionTime + "ms");
+        System.out.println("                logging info: " + joinPoint.getSignature()
+                + " executed in " + executionTime + "ms");
         return proceed;
     }
 }
