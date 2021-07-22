@@ -1,5 +1,6 @@
 package org.application.controller;
 
+import org.application.aspects.LogThisExecutionTime;
 import org.application.exceptions.UserException;
 import org.application.model.mapping.UserMapper;
 import org.application.model.user.UserData;
@@ -64,6 +65,7 @@ public class UserDataController {
         }
     }
 
+    @LogThisExecutionTime
     @PutMapping("/{id}")
     public UserDataDTO updateUser(@PathVariable("id") Long userId,
                                   @RequestBody UserDataDTO userDataDTO) throws UserException {

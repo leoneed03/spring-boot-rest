@@ -1,5 +1,6 @@
 package org.application.service;
 
+import org.application.aspects.LogThisExecutionTime;
 import org.application.exceptions.UserException;
 import org.application.model.user.UserData;
 import org.application.repository.UserDataRepo;
@@ -33,7 +34,6 @@ public class UserStorageService {
         return repo.save(user);
     }
 
-    @Transactional
     public List<UserData> getAllUsers() {
 
         return repo.findAll();
@@ -45,7 +45,7 @@ public class UserStorageService {
         repo.deleteById(id);
     }
 
-    @Transactional
+    @LogThisExecutionTime
     public UserData getById(final Long id) throws UserException {
 
         return repo.findById(id).orElseThrow(() ->

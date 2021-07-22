@@ -74,18 +74,25 @@ class SpringBootRestApplicationTests {
         Assertions.assertTrue(userDataSaved.getId() > 0);
     }
 
+    //test AOP [aspects]
     @Test
     void savedUserPersists() {
 
         UserData userDataToSave = new UserData(null, "PersistedUser", "persisted_user@mail.ru");
 
+        String testStringToPrint = "Test: ";
+
+        System.out.println(testStringToPrint + "START SAVING USER");
         UserData userDataSaved = userStorageService.saveUser(userDataToSave);
+        System.out.println(testStringToPrint + "USER SAVED");
 
         AtomicReference<UserData> userDataRetrieved = new AtomicReference<>();
 
+        System.out.println(testStringToPrint + "START GETTING USER");
         Assertions.assertDoesNotThrow(
                 () -> userDataRetrieved.set(userStorageService.getById(userDataSaved.getId()))
         );
+        System.out.println(testStringToPrint + "GOT USER");
 
         Assertions.assertEquals(userDataToSave.getName(),
                 userDataRetrieved.get().getName());
